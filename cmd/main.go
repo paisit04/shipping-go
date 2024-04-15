@@ -9,6 +9,7 @@ import (
 
 	"github.com/paisit04/shipping-go/handlers"
 	"github.com/paisit04/shipping-go/handlers/rest"
+	"github.com/paisit04/shipping-go/translation"
 )
 
 func main() {
@@ -19,7 +20,9 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/hello", rest.TranslateHandler)
+	translationService := translation.NewStaticService()
+	translateHandler := rest.NewTranslateHandler(translationService)
+	mux.HandleFunc("/hello", translateHandler.TranslateHandler)
 	mux.HandleFunc("/health", handlers.HealthCheck)
 
 	log.Printf("listening on %s\n", addr)

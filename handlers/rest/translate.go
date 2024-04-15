@@ -6,9 +6,22 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-
-	"github.com/paisit04/shipping-go/translation"
 )
+
+type Translator interface {
+	Translate(word, language string) string
+}
+
+// TranslateHandler will translate calls for caller.
+type TranslateHandler struct {
+	service Translator
+}
+
+// NewTranslateHandler will create a new instance of the handler using a
+// translation service.
+func NewTranslateHandler(service Translator) *TranslateHandler {
+	return &TranslateHandler{service: service}
+}
 
 type Resp struct {
 	Language    string `json:"language"`
@@ -17,7 +30,10 @@ type Resp struct {
 
 const defaultLanguage = "english"
 
-func TranslateHandler(w http.ResponseWriter, r *http.Request) {
+// TranslateHandler will take a given request with a path value of the
+// word to be translated and a query parameter of the
+// language to translate to.
+func (t *TranslateHandler) TranslateHandler(w http.ResponseWriter, r *http.Request) {
 	enc := json.NewEncoder(w)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
@@ -26,7 +42,7 @@ func TranslateHandler(w http.ResponseWriter, r *http.Request) {
 		language = defaultLanguage
 	}
 	word := strings.ReplaceAll(r.URL.Path, "/", "")
-	translation := translation.Translate(word, language)
+	translation := t.service.Translate(word, language)
 	if translation == "" {
 		w.WriteHeader(http.StatusNotFound)
 		return

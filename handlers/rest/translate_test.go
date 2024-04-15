@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/paisit04/shipping-go/handlers/rest"
+	"github.com/paisit04/shipping-go/translation"
 )
 
 func TestTranslateAPI(t *testing.T) {
@@ -36,7 +37,8 @@ func TestTranslateAPI(t *testing.T) {
 		},
 	}
 
-	handler := http.HandlerFunc(rest.TranslateHandler)
+	underTest := rest.NewTranslateHandler(translation.NewStaticService())
+	handler := http.HandlerFunc(underTest.TranslateHandler)
 
 	for _, test := range tt {
 		rr := httptest.NewRecorder()
