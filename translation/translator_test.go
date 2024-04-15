@@ -40,6 +40,11 @@ func TestTranslate(t *testing.T) {
 		},
 		{
 			Word:        "hello",
+			Language:    "french",
+			Translation: "bonjour",
+		},
+		{
+			Word:        "hello",
 			Language:    "dutch",
 			Translation: "",
 		},
