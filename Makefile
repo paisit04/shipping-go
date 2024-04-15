@@ -1,6 +1,6 @@
 GO_VERSION :=1.22
 
-.PHONY: install-go init-go build test coverage report
+.PHONY: install-go init-go build test coverage report check-format
 
 setup: install-go init-go
 
@@ -26,3 +26,6 @@ coverage:
 
 report:
 	go tool cover -html=coverage.out -o cover.html
+
+check-format:
+	test -z $$(go fmt ./...)
