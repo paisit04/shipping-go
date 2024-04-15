@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  api-min:
+    profiles: ['prod']
+    ports:
+      - 8080:8080
+    build: .
+  api-dev:
+    profiles: ['dev']
+    ports:
+      - 8080:8080
+    build:
+      context: .
+      target: dev
