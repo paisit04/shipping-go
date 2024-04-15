@@ -15,5 +15,7 @@
 vendor/
  
 api
+coverage.out
+cover.html
 
 .DS_Store
