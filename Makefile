@@ -1,8 +1,8 @@
 GO_VERSION :=1.22
 
-.PHONY: install-go init-go build test coverage report check-format install-lint static-check
+.PHONY: install-go init-go build test coverage report check-format install-lint static-check copy-hooks
 
-setup: install-go init-go install-lint
+setup: install-go init-go install-lint copy-hooks
 
 #TODO add MacOS support
 install-go:
@@ -35,3 +35,7 @@ install-lint:
 
 static-check:
 	golangci-lint run
+
+copy-hooks:
+	chmod +x scripts/hooks/*
+	cp -r scripts/hooks .git/.
