@@ -1,4 +1,12 @@
 GO_VERSION :=1.22
+TAG := $(shell git describe --abbrev=0 --tags --always)
+HASH := $(shell git rev-parse HEAD)
+
+DATE := $(shell date +%Y-%m-%d.%H:%M:%S)
+
+LDFLAGS := -w -X github.com/paisit04/shipping-go/handlers.hash=$(HASH) \
+              -X github.com/paisit04/shipping-go/handlers.tag=$(TAG) \
+			  -X github.com/paisit04/shipping-go/handlers.date=$(DATE)
 
 .PHONY: install-go init-go build test coverage report check-format install-lint static-check copy-hooks
 
@@ -15,7 +23,7 @@ init-go:
 	echo 'export PATH=$$PATH:$${HOME}/go/bin' >> $${HOME}/.bashrc
 
 build:
-	go build -o api cmd/main.go
+	go build -ldflags "$(LDFLAGS)" -o api cmd/main.go
 
 test:
 	go test ./... -coverprofile=coverage.out

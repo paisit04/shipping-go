@@ -1,29 +1,37 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
+	"github.com/paisit04/shipping-go/config"
 	"github.com/paisit04/shipping-go/handlers"
 	"github.com/paisit04/shipping-go/handlers/rest"
 	"github.com/paisit04/shipping-go/translation"
 )
 
 func main() {
-	addr := fmt.Sprintf(":%s", os.Getenv("PORT"))
+	cfg := config.LoadConfiguration()
+	addr := cfg.Port
 	if addr == ":" {
 		addr = ":8080"
 	}
 
 	mux := http.NewServeMux()
 
-	translationService := translation.NewStaticService()
+	var translationService rest.Translator
+	translationService = translation.NewStaticService()
+	if cfg.LegacyEndpoint != "" {
+		log.Printf("creating external translation client: %s", cfg.LegacyEndpoint)
+		client := translation.NewHelloClient(cfg.LegacyEndpoint)
+		translationService = translation.NewRemoteService(client)
+	}
+
 	translateHandler := rest.NewTranslateHandler(translationService)
 	mux.HandleFunc("/hello", translateHandler.TranslateHandler)
 	mux.HandleFunc("/health", handlers.HealthCheck)
+	mux.HandleFunc("/info", handlers.Info)
 
 	log.Printf("listening on %s\n", addr)
 
