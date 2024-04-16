@@ -8,9 +8,9 @@ LDFLAGS := -w -X github.com/paisit04/shipping-go/handlers.hash=$(HASH) \
               -X github.com/paisit04/shipping-go/handlers.tag=$(TAG) \
 			  -X github.com/paisit04/shipping-go/handlers.date=$(DATE)
 
-.PHONY: install-go init-go build test coverage report check-format install-lint static-check copy-hooks
+.PHONY: install-go init-go build test coverage report check-format install-lint static-check copy-hooks install-godog
 
-setup: install-go init-go install-lint copy-hooks
+setup: install-go init-go install-lint copy-hooks install-godog
 
 #TODO add MacOS support
 install-go:
@@ -47,3 +47,6 @@ static-check:
 copy-hooks:
 	chmod +x scripts/hooks/*
 	cp -r scripts/hooks .git/.
+
+install-godog:
+	go install github.com/cucumber/godog/cmd/godog@latest

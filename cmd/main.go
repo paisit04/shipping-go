@@ -14,24 +14,8 @@ import (
 func main() {
 	cfg := config.LoadConfiguration()
 	addr := cfg.Port
-	if addr == ":" {
-		addr = ":8080"
-	}
 
-	mux := http.NewServeMux()
-
-	var translationService rest.Translator
-	translationService = translation.NewStaticService()
-	if cfg.LegacyEndpoint != "" {
-		log.Printf("creating external translation client: %s", cfg.LegacyEndpoint)
-		client := translation.NewHelloClient(cfg.LegacyEndpoint)
-		translationService = translation.NewRemoteService(client)
-	}
-
-	translateHandler := rest.NewTranslateHandler(translationService)
-	mux.HandleFunc("/hello", translateHandler.TranslateHandler)
-	mux.HandleFunc("/health", handlers.HealthCheck)
-	mux.HandleFunc("/info", handlers.Info)
+	mux := API(cfg)
 
 	log.Printf("listening on %s\n", addr)
 
@@ -42,4 +26,26 @@ func main() {
 	}
 
 	log.Fatal(srv.ListenAndServe())
+}
+
+func API(cfg config.Configuration) *http.ServeMux {
+	mux := http.NewServeMux()
+
+	var translationService rest.Translator
+	translationService = translation.NewStaticService()
+	if cfg.LegacyEndpoint != "" {
+		log.Printf("creating external translation client: %s", cfg.LegacyEndpoint)
+		client := translation.NewHelloClient(cfg.LegacyEndpoint)
+		translationService = translation.NewRemoteService(client)
+	}
+	if cfg.DatabaseURL != "" {
+		db := translation.NewDatabaseService(cfg)
+		translationService = db
+	}
+
+	translateHandler := rest.NewTranslateHandler(translationService)
+	mux.HandleFunc("/hello", translateHandler.TranslateHandler)
+	mux.HandleFunc("/health", handlers.HealthCheck)
+	mux.HandleFunc("/info", handlers.Info)
+	return mux
 }
